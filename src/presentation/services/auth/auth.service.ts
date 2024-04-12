@@ -1,4 +1,4 @@
-import { bcryptAdapter } from "../../../config";
+import { bcryptAdapter, JwtAdapter } from "../../../config";
 import { UserModel } from "../../../data";
 import { CustomError, LoginUserDto, RegisterUserDto, UserEntity } from "../../../domain";
 
@@ -22,11 +22,15 @@ export class AuthService {
          const { password, ...userEntity } = UserEntity.fromObject( user );
 
          // jwt user authentication
+         const token = await JwtAdapter.generateToken( { id: userEntity.id } );
+         if ( !token ) {
+            throw CustomError.internalServer('Error generating token');
+         }
          // Email verification
 
          return {
             user: userEntity,
-            token: '',
+            token,
          };
       } catch (error) {
          throw CustomError.internalServer(`${error}`)
@@ -43,12 +47,14 @@ export class AuthService {
       if ( !isMatching ) {
          throw CustomError.unauthorized( 'Invalid user credentials.' );
       }
-
       const { password, ...userEntity } = UserEntity.fromObject( existUser );
-
+      const token = await JwtAdapter.generateToken( { id: userEntity.id } );
+      if ( !token ) {
+         throw CustomError.internalServer('Error generating token');
+      }
       return {
          user: userEntity,
-         token: 'ABC',
+         token,
       };
    }
 }
