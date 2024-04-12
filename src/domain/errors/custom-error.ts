@@ -1,7 +1,7 @@
 export class CustomError extends Error {
    constructor(
       public readonly message: string,
-      private readonly statusCode: number
+      public readonly statusCode: number
    ){
       super(message);
    }

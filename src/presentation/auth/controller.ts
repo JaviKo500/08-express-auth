@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { RegisterUserDto } from "../../domain";
+import { CustomError, RegisterUserDto } from "../../domain";
 import { AuthService } from "../services";
 
 export class AuthController {
@@ -10,6 +10,19 @@ export class AuthController {
       
    }
 
+   private handleError = ( error: unknown, res: Response ) => {
+      if ( error instanceof CustomError) {
+         return res.status(error.statusCode).json({
+           error: error.message
+         });
+      }
+
+      console.log('<--------------- JK Controller --------------->');
+      console.log(error);
+      return res.status(500).json({
+        error: 'Internal Server Error',
+      });
+   }
    public registerUser = ( req: Request, res: Response ) => {
       const [ error, registerUserDto ] = RegisterUserDto.create(req.body);
       if ( error ) {
@@ -18,7 +31,8 @@ export class AuthController {
          });
       }
       this.authService.registerUser(registerUserDto!)
-         .then( (user) => res.status(200).json(user));
+         .then( user => res.status(200).json(user))
+         .catch( err => this.handleError( err, res ));
    }
    public loginUser = ( req: Request, res: Response ) => {
       res.status(200).json({
