@@ -1,3 +1,4 @@
+import { bcryptAdapter } from "../../../config";
 import { UserModel } from "../../../data";
 import { CustomError, RegisterUserDto, UserEntity } from "../../../domain";
 
@@ -14,11 +15,14 @@ export class AuthService {
       if ( existUser ) throw CustomError.badRequest('User already exists');
       try {
          const user = new UserModel(registerUserDto);
+         user.password = bcryptAdapter.hash( registerUserDto.password );
          await user.save();
-         // encrypt password
+         
+
+         const { password, ...userEntity } = UserEntity.fromObject( user );
+
          // jwt user authentication
          // Email verification
-         const { password, ...userEntity } = UserEntity.fromObject( user );
 
          return {
             user: userEntity,
