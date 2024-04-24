@@ -11,6 +11,8 @@ export class AuthController {
    }
 
    private handleError = ( error: unknown, res: Response ) => {
+      console.log('<--------------- JK Controller --------------->');
+      console.log(error);
       if ( error instanceof CustomError) {
          return res.status(error.statusCode).json({
            error: error.message
@@ -48,11 +50,8 @@ export class AuthController {
    public validateUser = ( req: Request, res: Response ) => {
       const { token } = req.params;
 
-      // this.authService.validateEmail(token)
-      //    .then(() => res.) 
-
-      res.status(200).json({
-        msg: token,
-      });
+      this.authService.validateEmail(token)
+         .then(() => res.json('Email validated') )
+         .catch( err => this.handleError( err, res)); 
    }
 }
