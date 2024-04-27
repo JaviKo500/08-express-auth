@@ -28,8 +28,9 @@ export class CategoryController {
          .catch( err => this.handleError(err, res) );
    }
    getCategories = (req: Request, res: Response) => {
-      console.log('<--------------- JK Controller --------------->');
-      console.log('test category');
-      res.json('list category');
+      
+      this.categoryService.getCategories()
+         .then( categories => res.status(200).json(categories))
+         .catch( err=> this.handleError(err, res));
    }
 }
