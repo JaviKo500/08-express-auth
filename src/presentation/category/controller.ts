@@ -1,8 +1,11 @@
 import { Request, Response } from "express";
 import { CreateCategoryDto, CustomError } from "../../domain";
+import { CategoryService } from "../services";
 
 export class CategoryController {
-   constructor(){}
+   constructor(
+      private readonly categoryService: CategoryService,
+   ){}
 
    private handleError = ( error: unknown, res: Response ) => {
       if ( error instanceof CustomError) {
@@ -17,15 +20,12 @@ export class CategoryController {
 
    createCategory = (req: Request, res: Response) => {
       const [ errors, categoryDto ] = CreateCategoryDto.create( req.body ); 
-      if ( errors ) {
-         return res.status(400).json({
-           errors
-         });
-      }
-      res.status(200).json({
-        categoryDto,
+      if ( errors ) return res.status(400).json({
         errors
       });
+      this.categoryService.createCategory( categoryDto!, req.body.user )
+         .then( category => res.status(201).json(category))
+         .catch( err => this.handleError(err, res) );
    }
    getCategories = (req: Request, res: Response) => {
       console.log('<--------------- JK Controller --------------->');
