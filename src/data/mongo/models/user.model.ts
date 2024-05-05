@@ -28,4 +28,12 @@ const userSchema = new mongoose.Schema({
    },
 });
 
+userSchema.set( 'toJSON', {
+   versionKey: false,
+   virtuals: true,
+   transform: function ( doc, ret, options ) {
+      delete ret._id;
+      delete ret.password;
+   }
+});
 export const UserModel = mongoose.model('User', userSchema);

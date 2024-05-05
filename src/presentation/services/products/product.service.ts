@@ -28,7 +28,9 @@ export class ProductsService {
             await ProductModel.countDocuments(),
             await ProductModel.find()
                .skip( (page - 1) * limit )
-               .limit( limit ),
+               .limit( limit )
+               .populate( 'user' )
+               .populate( 'category' )
                // todo: populate
          ]);
          return {
@@ -38,11 +40,13 @@ export class ProductsService {
             next: `/api/product?page=${page + 1}&limit=${limit}`,
             previous: (page -1 ) > 0 ? `/api/product?page=${page - 1 }&limit=${limit}` : null,
             products: products.map( product => {
-               const { _id, name, available } = product;
+               const { _id, name, available, user, category } = product;
                return {
                   id: _id,
                   name,
                   available,
+                  user, 
+                  category,
                }
             })
          }
