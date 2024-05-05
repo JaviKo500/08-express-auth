@@ -19,7 +19,10 @@ export class ProductsController {
    }
 
    createProduct = (req: Request, res: Response) => {
-      const [ errors, createProductDto ] = CreateProductsDto.create( req.body ); 
+      const [ errors, createProductDto ] = CreateProductsDto.create( {
+         ...req.body,
+         user: req.body.user.id
+      } ); 
       if ( errors ) return res.status(400).json({
         errors
       });
