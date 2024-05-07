@@ -18,6 +18,8 @@ export class FileUploadController {
    }
 
    uploadFile = (req: Request, res: Response) => {
+      console.log('<--------------- JK Controller --------------->');
+      console.log(req.files);
       res.status(200).json({
         msg: 'Uploading file',
       });
