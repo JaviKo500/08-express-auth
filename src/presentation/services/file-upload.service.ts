@@ -1,9 +1,13 @@
 import { UploadedFile } from "express-fileupload";
 import path from "path";
 import fs from 'fs';
+import { UuidAdapter } from "../../config";
+import { CustomError } from "../../domain";
 
 export class FileUploadService {
-   constructor() {
+   constructor(
+      private readonly uuid = UuidAdapter.v4
+   ) {
    }
 
    private checkFolder ( folderPath: string) {
@@ -20,17 +24,25 @@ export class FileUploadService {
       
       try {
          const fileExtension = file.mimetype.split('/').at(1);
+
+         if ( !fileExtension || !validExtensions.includes(fileExtension) ) {
+            throw CustomError.badRequest(`Invalid file extension: ${ fileExtension }, valid ones ${ validExtensions }`);
+         }
          const destination = path.resolve( __dirname , '../../../', folder);
    
          this.checkFolder( destination );
 
-         file.mv(`${destination}/my-image.${fileExtension}`);
+         const fileName = `${this.uuid()}.${fileExtension}`;
+
+         file.mv(`${destination}/${fileName}`);
+
+         return {fileName};
       } catch (error) {
-         console.log('<--------------- JK File-upload.service Error --------------->');
-         console.log(error);
+
+         throw error;
       }
    }
-   
+
    async uploadMultiple(
       file: UploadedFile [],
       folder: string = 'uploads',
