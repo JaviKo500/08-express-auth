@@ -44,8 +44,13 @@ export class FileUploadService {
    }
 
    async uploadMultiple(
-      file: UploadedFile [],
+      files: UploadedFile [],
       folder: string = 'uploads',
       validExtensions: string [] = [ 'png', 'jpg', 'jpeg', 'gif' ]
-   ){}
+   ){
+      const filesNames = await Promise.all(
+         files.map(file => this.uploadSingle( file, folder, validExtensions))
+      );
+      return filesNames;
+   }
 }
